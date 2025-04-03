@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>예매 조회</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+    input, button { margin: 10px; padding: 10px; font-size: 16px; }
+    #result, #allResults { margin-top: 20px; padding: 10px; border: 1px solid #ddd; display: inline-block; text-align: left; }
+  </style>
+</head>
+<body>
+<h2>예매 조회</h2>
+
+<!-- 개별 예약 조회 -->
+<label for="rId">예약 ID 입력:</label>
+<input type="number" id="rId" placeholder="예약 ID 입력">
+<button onclick="fetchTicket()">조회</button>
+
+<div id="result"></div>
+
+<!-- 전체 예약 조회 -->
+<h2>전체 예매 정보 조회</h2>
+<button onclick="fetchAllReservations()">전체 조회</button>
+
+<div id="allResults"></div>
+
+<script>
+  // 특정 ID로 예매 조회
+  function fetchTicket() {
+    const rId = document.getElementById("rId").value;
+    if (!rId) {
+      alert("예약 ID를 입력하세요!");
+      return;
+    }
+
+    fetch(`http://localhost:8787/reservation/${rId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error("서버 응답 실패");
+              }
+              return response.json();
+            })
+            .then(data => {
+              document.getElementById("result").innerHTML = `
+                        <h3>예약 정보</h3>
+                        <p><strong>티켓 ID:</strong> ${data.tId}</p>
+                        <p><strong>이름:</strong> ${data.uName}</p>
+                        <p><strong>좌석:</strong> ${data.rSpot}</p>
+                        <p><strong>날짜:</strong> ${data.pDate}</p>
+                        <p><strong>공연명:</strong> ${data.pTitle}</p>
+                        <p><strong>공연장:</strong> ${data.pPlace}</p>
+                    `;
+            })
+            .catch(error => {
+              document.getElementById("result").innerHTML = "<p>예약 정보를 찾을 수 없습니다.</p>";
+            });
+  }
+
+  // 전체 예매 목록 가져오기
+  function fetchAllReservations() {
+    fetch("http://localhost:8787/reservation/all")
+            .then(response => response.json())
+            .then(data => {
+              let output = "<h3>전체 예매 정보</h3>";
+              data.forEach(reservation => {
+                output += `
+                            <p><strong>예약 ID:</strong> ${reservation.rId}</p>
+                            <p><strong>이름:</strong> ${reservation.uName}</p>
+                            <p><strong>좌석:</strong> ${reservation.rSpot}</p>
+                            <p><strong>날짜:</strong> ${reservation.pDate}</p>
+                            <p><strong>공연명:</strong> ${reservation.pTitle}</p>
+                            <p><strong>공연장:</strong> ${reservation.pPlace}</p>
+                            <hr>
+                        `;
+              });
+              document.getElementById("allResults").innerHTML = output;
+            })
+            .catch(error => {
+              document.getElementById("allResults").innerHTML = "<p>예매 정보를 불러올 수 없습니다.</p>";
+            });
+  }
+</script>
+</body>
+</html>
