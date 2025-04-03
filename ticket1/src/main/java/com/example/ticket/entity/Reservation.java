@@ -54,6 +54,9 @@ public class Reservation {
     @Column(name = "p_price", nullable = false)
     private int pPrice;      // 좌석 가격
 
+    @Column(name = "p_all_spot", nullable = false)
+    private int pAllSpot;    // 전체 좌석
+
     @Column(name = "p_id", nullable = false, length = 255)
     private String pId;      // 공연 ID
 }

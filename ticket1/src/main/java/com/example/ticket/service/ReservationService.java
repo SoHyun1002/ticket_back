@@ -28,7 +28,7 @@ public class ReservationService {
                 .tId(res.getRId())
                 .rSpot(res.getRSpot())
                 .uName(res.getUName())
-                .pTitle("title")
+                .pTitle(res.getPTitle())
                 .pPlace(res.getPPlace())
                 .pDate(res.getPDate())
                 .build()).orElse(null);
