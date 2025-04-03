@@ -23,6 +23,7 @@ CREATE TABLE reservation (
                              p_date DATETIME NOT NULL,                -- 공연 날짜 및 시간
                              p_title VARCHAR(255) NOT NULL,           -- 공연 제목
                              p_place VARCHAR(255) NOT NULL,           -- 공연 장소
+                             p_all_spot INT NOT NULL,
                              p_price INT NOT NULL,                    -- 티켓 가격
                              p_id VARCHAR(255) NOT NULL,              -- 공연 ID (외래키)
                              FOREIGN KEY (p_id) REFERENCES performance(p_id) ON DELETE CASCADE
