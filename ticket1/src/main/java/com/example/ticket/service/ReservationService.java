@@ -4,11 +4,8 @@ import com.example.ticket.dto.Ticket;
 import com.example.ticket.entity.Reservation;
 import com.example.ticket.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,10 +19,10 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
 
-    public Ticket getTicket(Long rId) {
-        Optional<Reservation> reservation = reservationRepository.findById(rId);
+    public Ticket getTicket(Long pId) {
+        Optional<Reservation> reservation = reservationRepository.findById(pId);
         return reservation.map(res -> Ticket.builder()
-                .tId(res.getRId())
+                .tId(res.getPId())
                 .rSpot(res.getRSpot())
                 .uName(res.getUName())
                 .pTitle(res.getPTitle())
@@ -38,7 +35,7 @@ public class ReservationService {
         Reservation reservation = Reservation.builder()
                 .uName(ticket.getUName())
                 .pTitle(ticket.getPTitle())
-                .pPlace(ticket.getPPlace())
+                .pPlace (ticket.getPPlace())
                 .pDate(ticket.getPDate() != null ? ticket.getPDate() : LocalDateTime.now()) // 기본값 설정
                 .rSpot(ticket.getRSpot())
                 .build();
