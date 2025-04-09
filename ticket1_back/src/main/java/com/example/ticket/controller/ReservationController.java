@@ -5,6 +5,7 @@ import com.example.ticket.dto.ReservationRequest;
 import com.example.ticket.dto.Ticket;
 import com.example.ticket.service.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,9 +77,10 @@ public class ReservationController {
     /**
      * rPhone, rEmail 정보 업데이트
      */
+
     @PostMapping("/complete")
     public ResponseEntity<ReservationRequest> confirmPost(
-            @RequestParam String key ,
+            @RequestParam String key,
             @RequestParam String rEmail,
             @RequestParam String rPhone
     ) {
@@ -90,7 +92,7 @@ public class ReservationController {
      * 예매 확정 페이지
      */
     @GetMapping("/complete")
-    public ResponseEntity<ReservationRequest> completeGet( @RequestParam String key) {
+    public ResponseEntity<ReservationRequest> completeGet(@RequestParam String key) {
         ReservationRequest request = selectStorage.get(key);
         return ResponseEntity.ok(request);
     }
@@ -99,7 +101,7 @@ public class ReservationController {
      * 좌석 개별 예약 → 티켓 생성
      */
     @PostMapping("/ticket")
-    public ResponseEntity<List<Ticket>> completePost( @RequestParam String key) {
+    public ResponseEntity<List<Ticket>> completePost(@RequestParam String key) {
         ReservationRequest request = selectStorage.get(key);
         List<ReservationDTO> reservationList = reservationService.createFinalReservations(request);
 
@@ -128,4 +130,15 @@ public class ReservationController {
 
         return ResponseEntity.ok(nonAvailableRSpots);
     }
+
+    @GetMapping("/save")
+    public ResponseEntity<?> saveReservation(@RequestParam String key) {
+        ReservationRequest request = selectStorage.get(key);
+        reservationService.createFinalReservations(request); // Redis에서 꺼내서 DB 저장
+        return ResponseEntity.ok().build();
+    }
+
+
+
+
 }

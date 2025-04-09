@@ -135,5 +135,4 @@ public class ReservationService {
                 .map(Reservation::getRSpot)
                 .collect(Collectors.toList());
     }
-
 }

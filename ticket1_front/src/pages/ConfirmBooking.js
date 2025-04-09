@@ -20,6 +20,7 @@ function ConfirmPage() {
                 console.error("❌ 예매 확인 중 오류:", error);
             }
         };
+
         if (key) fetchData();
     }, [key]);
 
@@ -35,10 +36,9 @@ function ConfirmPage() {
             params.append("rPhone", rPhone);
             params.append("rEmail", rEmail);
     
-            // 백엔드로 예약 완료 요청
+            // 백엔드로 예약 완료 확인 요청
             await axios.post("http://localhost:8787/reservation/complete", params);
-            
-            alert("예매가 완료되었습니다.");
+
             navigate(`/complete/${key}`);
         } catch (error) {
             console.error("❌ 예매 완료 중 오류:", error);
@@ -65,7 +65,7 @@ function ConfirmPage() {
                 <li><strong>전화번호:</strong> <input type="text" value={rPhone} onChange={(e) => setRPhone(e.target.value)} /></li>
                 <li><strong>이메일:</strong> <input type="text" value={rEmail} onChange={(e) => setREmail(e.target.value)} /></li>
             </ul>
-            <button className="complete-btn" onClick={handleComplete}>예매 완료</button>
+            <button className="complete-btn" onClick={handleComplete}>작성 완료</button>
         </div>
     );
 }
