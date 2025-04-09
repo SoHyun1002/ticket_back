@@ -20,7 +20,6 @@ function ConfirmPage() {
                 console.error("❌ 예매 확인 중 오류:", error);
             }
         };
-
         if (key) fetchData();
     }, [key]);
 

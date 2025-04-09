@@ -118,4 +118,14 @@ public class ReservationController {
     public ResponseEntity<List<Ticket>> getTickets(@RequestBody List<Ticket> tickets) {
         return ResponseEntity.ok(tickets);
     }
+
+    @GetMapping("/seat/status")
+    public ResponseEntity<List<String>> seatStatus(@RequestParam String key) {
+        ReservationRequest request = selectStorage.get(key);
+        Long pId = request.getReservationDTO().getPId();
+        Long uId = request.getReservationDTO().getUId();
+        List<String> nonAvailableRSpots = reservationService.getNonAvailableRSpots(pId, uId);
+
+        return ResponseEntity.ok(nonAvailableRSpots);
+    }
 }

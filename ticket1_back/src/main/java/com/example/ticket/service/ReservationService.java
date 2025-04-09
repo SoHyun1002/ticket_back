@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,4 +125,15 @@ public class ReservationService {
                 .pId(res.getPId())
                 .build();
     }
+    public List<String> getNonAvailableRSpots(Long pId, Long uId) {
+        // pId와 uId에 해당하는 모든 엔티티 조회
+        List<Reservation> reservations = reservationRepository.findByPIdAndUId(pId, uId);
+
+        // rSpotStatus가 "nonAvailable"인 rSpot을 필터링하여 리스트에 추가
+        return reservations.stream()
+                .filter(reservation -> "nonAvailable".equals(reservation.getRSpotStatus()))
+                .map(Reservation::getRSpot)
+                .collect(Collectors.toList());
+    }
+
 }
