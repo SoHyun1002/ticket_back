@@ -12,7 +12,7 @@ function ConfirmPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8787/reservation/confirm?key=${key}`);
+                const response = await axios.get(`http://localhost:8787/reservation/select?key=${key}`);
                 setData(response.data);
                 setRPhone(response.data.reservationDTO.rPhone);
                 setREmail(response.data.reservationDTO.rEmail);
