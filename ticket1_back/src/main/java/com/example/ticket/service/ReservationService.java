@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,13 +24,15 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
-
     // 최종 단계 엔티티 생성
     public List<ReservationDTO> createFinalReservations(ReservationRequest request) {
         ReservationDTO dto = request.getReservationDTO();
         List<String> rSpots = request.getRSpots();
 
         List<ReservationDTO> reservations = new ArrayList<>();
+
+        // 날짜 포맷터 준비
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         for (String rSpot : rSpots) {
             Reservation reservation = Reservation.builder()
@@ -38,7 +42,7 @@ public class ReservationService {
                     .pId(dto.getPId())
                     .pTitle(dto.getPTitle())
                     .pPlace(dto.getPPlace())
-                    .pDate(LocalDateTime.parse(dto.getPDate()))
+                    .pDate(LocalDate.parse(dto.getPDate(), formatter).atStartOfDay()) // ← 수정된 부분
                     .pPrice(Integer.parseInt(dto.getPPrice()))
                     .pAllSpot(dto.getPAllSpot())
                     .rPhone(dto.getRPhone())
@@ -54,9 +58,6 @@ public class ReservationService {
         return reservations;
     }
 
-
-
-
     // 예매 dto 정보 업데이트
     public ReservationRequest confirmReservations(ReservationRequest request, String rEmail, String rPhone) {
         // 이메일과 전화번호를 DTO에 반영
@@ -67,10 +68,6 @@ public class ReservationService {
         // 그대로 리턴 (좌석 목록과 함께)
         return new ReservationRequest(updatedDTO, request.getRSpots());
     }
-
-
-
-
 
     // 단일 예매 조회
     public ReservationDTO getReservation(Long rId) {
@@ -106,7 +103,7 @@ public class ReservationService {
                 .orElse(null);
     }
 
-    /* DTO 변환 */
+    // DTO 변환 메서드
     private ReservationDTO toDTO(Reservation res) {
         return ReservationDTO.builder()
                 .rId(res.getRId())
@@ -125,11 +122,10 @@ public class ReservationService {
                 .pId(res.getPId())
                 .build();
     }
+
     public List<String> getNonAvailableRSpots(Long pId, Long uId) {
-        // pId와 uId에 해당하는 모든 엔티티 조회
         List<Reservation> reservations = reservationRepository.findByPIdAndUId(pId, uId);
 
-        // rSpotStatus가 "nonAvailable"인 rSpot을 필터링하여 리스트에 추가
         return reservations.stream()
                 .filter(reservation -> "nonAvailable".equals(reservation.getRSpotStatus()))
                 .map(Reservation::getRSpot)

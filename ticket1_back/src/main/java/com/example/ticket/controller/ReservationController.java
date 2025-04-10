@@ -4,6 +4,7 @@ import com.example.ticket.dto.ReservationDTO;
 import com.example.ticket.dto.ReservationRequest;
 import com.example.ticket.dto.Ticket;
 import com.example.ticket.service.ReservationService;
+import com.example.ticket.util.TimedStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,7 @@ import java.util.*;
 public class ReservationController {
 
     private final ReservationService reservationService;
-
-    // 서버 메모리에 임시 저장할 Map
-    private final Map<String, ReservationRequest> selectStorage = new HashMap<>();
+    private final TimedStorage timedStorage;
 
     /**
      * ✅ 테스트 및 좌석 선택을 위한 데이터 저장
@@ -32,7 +31,7 @@ public class ReservationController {
         String key = UUID.randomUUID().toString(); // 고유 키 생성
         ReservationRequest request = new ReservationRequest();
         request.setReservationDTO(reservationDTO);
-        selectStorage.put(key, request);
+        timedStorage.put(key, request);
 
         return ResponseEntity.ok(key); // 클라이언트는 이 키를 기억해야 함
     }
@@ -43,7 +42,7 @@ public class ReservationController {
      */
     @GetMapping("/select")
     public ResponseEntity<ReservationRequest> selectGet(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         if (request == null) {
             return ResponseEntity.notFound().build();
         }
@@ -55,7 +54,7 @@ public class ReservationController {
      */
     @PostMapping("/confirm")
     public ResponseEntity<ReservationRequest> selectPost(@RequestParam String key, @RequestParam List<String> rSpots) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
 
         if (request == null) {
             return ResponseEntity.notFound().build();
@@ -70,7 +69,7 @@ public class ReservationController {
      */
     @GetMapping("/confirm")
     public ResponseEntity<ReservationRequest> confirmGet(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         return ResponseEntity.ok(request);
     }
 
@@ -84,7 +83,7 @@ public class ReservationController {
             @RequestParam String rEmail,
             @RequestParam String rPhone
     ) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         return ResponseEntity.ok(reservationService.confirmReservations(request, rEmail, rPhone));
     }
 
@@ -93,7 +92,7 @@ public class ReservationController {
      */
     @GetMapping("/complete")
     public ResponseEntity<ReservationRequest> completeGet(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         return ResponseEntity.ok(request);
     }
 
@@ -102,7 +101,7 @@ public class ReservationController {
      */
     @PostMapping("/ticket")
     public ResponseEntity<List<Ticket>> completePost(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         List<ReservationDTO> reservationList = reservationService.createFinalReservations(request);
 
         List<Ticket> tickets = reservationList.stream()
@@ -123,7 +122,7 @@ public class ReservationController {
 
     @GetMapping("/seat/status")
     public ResponseEntity<List<String>> seatStatus(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
+        ReservationRequest request = timedStorage.get(key);
         Long pId = request.getReservationDTO().getPId();
         Long uId = request.getReservationDTO().getUId();
         List<String> nonAvailableRSpots = reservationService.getNonAvailableRSpots(pId, uId);
@@ -131,14 +130,11 @@ public class ReservationController {
         return ResponseEntity.ok(nonAvailableRSpots);
     }
 
-    @GetMapping("/save")
+    @PostMapping("/save")
     public ResponseEntity<?> saveReservation(@RequestParam String key) {
-        ReservationRequest request = selectStorage.get(key);
-        reservationService.createFinalReservations(request); // Redis에서 꺼내서 DB 저장
+        ReservationRequest request = timedStorage.get(key);
+        reservationService.createFinalReservations(request);
         return ResponseEntity.ok().build();
     }
-
-
-
 
 }

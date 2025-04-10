@@ -22,7 +22,10 @@ function ConfirmFinalPage() {
 
     const handleConfirm = async () => {
         try {
-            await axios.post("http://localhost:8787/reservation/save", { key });
+            const params = new URLSearchParams();
+            params.append("key", key);
+    
+            await axios.post("http://localhost:8787/reservation/save", params);
             alert("✅ 예매가 확정되었습니다.");
             navigate(`/complete/${key}`);
         } catch (error) {
@@ -30,6 +33,7 @@ function ConfirmFinalPage() {
             alert("예매 확정 중 문제가 발생했습니다.");
         }
     };
+    
 
     const handleCancel = async () => {
         try {
