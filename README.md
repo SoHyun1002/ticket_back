@@ -27,8 +27,6 @@ POST http://localhost:8787/reservation/select
     "pPrice": "50000",
     "pAllSpot": 20,
     "rId": 2001,
-    "rSpot": "A12",
-    "rSpotStatus": "reserved",
     "rPhone": "010-1234-5678",
     "rEmail": "hong@test.com",
     "rTime": "2025-04-08T16:08:37"
@@ -54,13 +52,11 @@ POST http://localhost:8787/reservation/select
 
 **GET 요청 형식:**  
 ```
-GET http://localhost:8787/reservation/complete?key=키값대입
+GET http://localhost:8787/reservation/seat/status?key=키값대입
 ```
 
 **확인 가능한 데이터:**  
-- 선택한 좌석 정보  
-- 수정된 예매 전화번호  
-- 수정된 예매 이메일  
+- 선택한 좌석 정보가 뜨면 성공적
 
 ---
 
